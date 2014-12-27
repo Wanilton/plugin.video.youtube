@@ -2,9 +2,8 @@ import json
 import os
 import re
 
-import requests
-
 from resources.lib.kodion.utils import FunctionCache
+from resources.lib.kodion import client
 from .json_script_engine import JsonScriptEngine
 
 __author__ = 'bromix'
@@ -57,7 +56,7 @@ class Cipher(object):
             url = 'http://'+url
             pass
 
-        result = requests.get(url, headers=headers, verify=False, allow_redirects=True)
+        result = client.get(url, headers=headers)
         java_script = result.text
 
         return self._load_java_script(java_script)

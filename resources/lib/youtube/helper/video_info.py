@@ -4,19 +4,9 @@ import urllib
 import urlparse
 import re
 
-import requests
-# Verify is disabled and to avoid warnings we disable the warnings. Behind a proxy request isn't working correctly all
-# the time and if so can't validate the hosts correctly resulting in a exception and the addon won't work properly.
-try:
-    from requests.packages import urllib3
-    urllib3.disable_warnings()
-except:
-    # do nothing
-    pass
-
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
-
+from resources.lib.kodion import client
 
 class VideoInfo(object):
     DEFAULT_ITAG_MAP = {'5': {'format': 'FLV', 'width': 320, 'height': 240},
@@ -85,7 +75,7 @@ class VideoInfo(object):
 
         url = 'https://www.youtube.com/watch'
 
-        result = requests.get(url, params=params, headers=headers, verify=False, allow_redirects=True)
+        result = client.get(url, params=params, headers=headers)
         html = result.text
 
         """
@@ -188,7 +178,7 @@ class VideoInfo(object):
 
         url = 'https://www.youtube.com/get_video_info'
 
-        result = requests.get(url, params=params, headers=headers, verify=False, allow_redirects=True)
+        result = client.get(url, params=params, headers=headers)
 
         stream_list = []
 
