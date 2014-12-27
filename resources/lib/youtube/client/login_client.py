@@ -1,20 +1,11 @@
-import time
-import urlparse
+import json
 
 __author__ = 'bromix'
 
-import requests
-# Verify is disabled and to avoid warnings we disable the warnings. Behind a proxy request isn't working correctly all
-# the time and if so can't validate the hosts correctly resulting in a exception and the addon won't work properly.
-try:
-    from requests.packages import urllib3
-
-    urllib3.disable_warnings()
-except:
-    # do nothing
-    pass
-
+import time
+import urlparse
 from resources.lib.youtube.youtube_exceptions import LoginException
+from resources.lib.kodion import client
 
 
 class LoginClient(object):
@@ -53,8 +44,8 @@ class LoginClient(object):
         # url
         url = 'https://www.youtube.com/o/oauth2/revoke'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
-        if result.status_code != requests.codes.ok:
+        result = client.post(url, data=post_data, headers=headers)
+        if result.code != 200:
             raise LoginException('Logout Failed')
 
         pass
@@ -87,12 +78,12 @@ class LoginClient(object):
         # url
         url = 'https://www.youtube.com/o/oauth2/token'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
-        if result.status_code != requests.codes.ok:
+        result = client.post(url, data=post_data, headers=headers)
+        if result.code != 200:
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            json_data = result.json()
+            json_data = json.loads(result.text)
             access_token = json_data['access_token']
             expires_in = time.time() + int(json_data.get('expires_in', 3600))
             return access_token, expires_in
@@ -127,12 +118,12 @@ class LoginClient(object):
         # url
         url = 'https://www.youtube.com/o/oauth2/token'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
-        if result.status_code != requests.codes.ok:
+        result = client.post(url, data=post_data, headers=headers)
+        if result.code != 200:
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            return result.json()
+            return json.loads(result.text)
 
         return None
 
@@ -157,12 +148,12 @@ class LoginClient(object):
         # url
         url = 'https://www.youtube.com/o/oauth2/device/code'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
-        if result.status_code != requests.codes.ok:
+        result = client.post(url, data=post_data, headers=headers)
+        if result.code != 200:
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            return result.json()
+            return json.loads(result.text)
 
         return None
 
@@ -191,14 +182,14 @@ class LoginClient(object):
                      'app': 'com.google.android.youtube',
                      # 'client_sig': '24bb24c05e47e0aefa68a58a766179d9b613a600',
                      'callerPkg': 'com.google.android.youtube',
-                     #'callerSig': '24bb24c05e47e0aefa68a58a766179d9b613a600',
+                     # 'callerSig': '24bb24c05e47e0aefa68a58a766179d9b613a600',
                      'Passwd': password.encode('utf-8')}
 
         # url
         url = 'https://android.clients.google.com/auth'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
-        if result.status_code != requests.codes.ok:
+        result = client.post(url, data=post_data, headers=headers)
+        if result.code != 200:
             raise LoginException('Login Failed')
 
         lines = result.text.replace('\n', '&')
@@ -209,4 +200,5 @@ class LoginClient(object):
             raise LoginException('Failed to get token')
 
         return token, expires
+
     pass

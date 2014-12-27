@@ -1,22 +1,9 @@
 __author__ = 'bromix'
 
 import json
-
-import requests
-
-
-# Verify is disabled and to avoid warnings we disable the warnings. Behind a proxy request isn't working correctly all
-# the time and if so can't validate the hosts correctly resulting in a exception and the addon won't work properly.
-try:
-    from requests.packages import urllib3
-
-    urllib3.disable_warnings()
-except:
-    # do nothing
-    pass
-
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
+from resources.lib.kodion import client
 
 
 class YouTube(LoginClient):
@@ -378,28 +365,25 @@ class YouTube(LoginClient):
 
         result = None
         if method == 'GET':
-            result = requests.get(_url, params=_params, headers=_headers, verify=False, allow_redirects=allow_redirects)
+            result = client.get(_url, params=_params, headers=_headers)
             pass
         elif method == 'POST':
-            _headers['content-type'] = 'application/json'
-            result = requests.post(_url, data=json.dumps(post_data), params=_params, headers=_headers, verify=False,
-                                   allow_redirects=allow_redirects)
+            _headers['Content-Type'] = 'application/json'
+            result = client.post(_url, data=post_data, params=_params, headers=_headers)
             pass
         elif method == 'PUT':
-            _headers['content-type'] = 'application/json'
-            result = requests.put(_url, data=json.dumps(post_data), params=_params, headers=_headers, verify=False,
-                                  allow_redirects=allow_redirects)
+            _headers['Content-Type'] = 'application/json'
+            result = client.put(_url, data=post_data, params=_params, headers=_headers)
             pass
         elif method == 'DELETE':
-            result = requests.delete(_url, params=_params, headers=_headers, verify=False,
-                                     allow_redirects=allow_redirects)
+            result = client.delete(_url, params=_params, headers=_headers)
             pass
 
         if result is None:
             return {}
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            return result.json()
+            return json.loads(result.text)
 
         pass
 
@@ -430,14 +414,14 @@ class YouTube(LoginClient):
 
         result = None
         if method == 'GET':
-            result = requests.get(url, params=_params, headers=_headers, verify=False, allow_redirects=allow_redirects)
+            result = client.get(url, params=_params, headers=_headers)
             pass
 
         if result is None:
             return {}
 
         if method != 'DELETE' and result.text:
-            return result.json()
+            return json.loads(result.text)
         pass
 
     pass
