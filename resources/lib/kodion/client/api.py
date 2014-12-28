@@ -8,6 +8,19 @@ from StringIO import StringIO
 import gzip
 
 
+class DummyResponse():
+    def __init__(self):
+        self.headers = {}
+        self.code = -1
+        self.text = u''
+        pass
+
+    def read(self):
+        return self.text
+
+    pass
+
+
 def _request(method, url, params=None, data=None, headers=None):
     if not headers:
         headers = {}
@@ -35,14 +48,23 @@ def _request(method, url, params=None, data=None, headers=None):
             request.data = json.dumps(data)
             pass
         else:
-            request.data = urllib.urlencode(data)
+            if not isinstance(data, basestring):
+                data = str(data)
+                pass
+
+            if isinstance(data, str):
+                data = data.encode('utf-8')
+                pass
+            request.data = data
             pass
         pass
     request.get_method = lambda: method
+    response = DummyResponse()
     try:
         response = opener.open(request)
     except urllib2.HTTPError, e:
-        connection = e
+        from .. import logging
+        logging.log_error(e.__str__())
         pass
 
     if response.headers.get('Content-Encoding', '').startswith('gzip'):

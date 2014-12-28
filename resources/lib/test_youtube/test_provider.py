@@ -10,8 +10,10 @@ class TestProvider(unittest.TestCase):
     def test_play(self):
         provider = Provider()
 
+        #K5B6wxjvsgU
+
         path = kodion.utils.create_path('play')
-        context = kodion.Context(path=path, params={'video_id': 'puMYeBRTsHs'})
+        context = kodion.Context(path=path, params={'video_id': 'K5B6wxjvsgU'})
         result = provider.navigate(context)
         items = result[0]
         pass
@@ -27,6 +29,8 @@ class TestProvider(unittest.TestCase):
 
     def test_on_channel_playlist(self):
         provider = Provider()
+
+        #PL82F5E50F9AF06ED8
 
         path = kodion.utils.create_path('channel', 'some_channel_id', 'playlist', 'UUDbAn9LEzqONk__uXA6a9jQ')
         context = kodion.Context(path=path)
