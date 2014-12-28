@@ -289,9 +289,11 @@ class Provider(kodion.AbstractProvider):
         video_id = context.get_param('video_id', '')
         if video_id:
             client = self.get_client(context)
-            playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id='WL', video_id=video_id)
+            resource_manager = self.get_resource_manager(context)
+            playlists = resource_manager.get_related_playlists(channel_id='mine')
+            playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=playlists['watchLater'], video_id=video_id)
             if playlist_item_id:
-                json_data = client.remove_video_from_playlist('WL', playlist_item_id)
+                json_data = client.remove_video_from_playlist(playlists['watchLater'], playlist_item_id)
                 if not v3.handle_error(self, context, json_data):
                     return False
                 pass
